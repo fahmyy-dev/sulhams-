@@ -1,0 +1,242 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Categories | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/categories.css' %}">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <header class="topbar">
+
+            <div class="brand">
+                <div class="brand-logo">S</div>
+
+                <div>
+                    <h2>SHOP SYSTEM</h2>
+                    <span>Owner Panel</span>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+
+                <span class="username">
+                    {{ request.user.username }}
+                </span>
+
+                <a href="{% url 'owner_dashboard' %}" class="back-btn">
+                    Dashboard
+                </a>
+
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    Logout
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <main class="main-content">
+
+            <div class="page-heading">
+
+                <div>
+                    <span class="page-label">PRODUCT MANAGEMENT</span>
+
+                    <h1>Categories</h1>
+
+                    <p>
+                        Manage product categories for your cosmetics shop.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="add-btn"
+                    onclick="openCategoryForm()"
+                >
+                    + Add Category
+                </button>
+
+            </div>
+
+
+            <!-- Add Category Form -->
+
+            <div id="categoryForm" class="form-card hidden">
+
+                <div class="form-header">
+
+                    <div>
+                        <h2>Add New Category</h2>
+                        <p>Create a category for your products.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="close-btn"
+                        onclick="closeCategoryForm()"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <div class="form-group">
+
+                        <label for="name">
+                            Category Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Example: Body Lotion"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="button"
+                            class="cancel-btn"
+                            onclick="closeCategoryForm()"
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="save-btn"
+                        >
+                            Save Category
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- Categories List -->
+
+            <section class="content-card">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>All Categories</h2>
+
+                        <p>
+                            {{ categories|length }} categories available
+                        </p>
+                    </div>
+
+                </div>
+
+
+                {% if categories %}
+
+                    <div class="category-grid">
+
+                        {% for category in categories %}
+
+                            <div class="category-card">
+
+                                <div class="category-icon">
+                                    C
+                                </div>
+
+                                <div class="category-info">
+
+                                    <h3>
+                                        {{ category.name }}
+                                    </h3>
+
+                                    <span>
+                                        Product Category
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            C
+                        </div>
+
+                        <h3>No Categories Yet</h3>
+
+                        <p>
+                            Add your first product category to get started.
+                        </p>
+
+                        <button
+                            type="button"
+                            class="add-btn"
+                            onclick="openCategoryForm()"
+                        >
+                            + Add Category
+                        </button>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </main>
+
+
+        <footer class="footer">
+            <p>Shop System &copy; 2026</p>
+        </footer>
+
+    </div>
+
+
+    <script>
+
+        function openCategoryForm() {
+            document
+                .getElementById("categoryForm")
+                .classList.remove("hidden");
+        }
+
+        function closeCategoryForm() {
+            document
+                .getElementById("categoryForm")
+                .classList.add("hidden");
+        }
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sellers | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/seller.css' %}">
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                S
+            </div>
+
+            <div>
+                <h2>SHOP SYSTEM</h2>
+                <span>Owner Panel</span>
+            </div>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+            <span class="username">
+                {{ request.user.username }}
+            </span>
+
+            <a href="{% url 'owner_dashboard' %}" class="back-btn">
+                Dashboard
+            </a>
+
+            <a href="{% url 'logout' %}" class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="main-content">
+
+        <div class="page-heading">
+
+            <div>
+
+                <span class="page-label">
+                    USER MANAGEMENT
+                </span>
+
+                <h1>Sellers</h1>
+
+                <p>
+                    Manage sellers who can make sales in the shop.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="add-btn"
+                onclick="openSellerForm()"
+            >
+                + Add Seller
+            </button>
+
+        </div>
+
+
+        <!-- Add Seller -->
+
+        <div id="sellerForm" class="form-card hidden">
+
+            <div class="form-header">
+
+                <div>
+                    <h2>Add New Seller</h2>
+                    <p>Create a login account for a shop seller.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="close-btn"
+                    onclick="closeSellerForm()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>
+                            Username
+                        </label>
+
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Enter username"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Enter password"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        onclick="closeSellerForm()"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="save-btn"
+                    >
+                        Create Seller
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- Sellers -->
+
+        <section class="content-card">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>All Sellers</h2>
+
+                    <p>
+                        {{ sellers|length }} sellers registered
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if sellers %}
+
+                <div class="seller-grid">
+
+                    {% for seller in sellers %}
+
+                        <div class="seller-card">
+
+                            <div class="seller-avatar">
+                                {{ seller.username|first|upper }}
+                            </div>
+
+
+                            <div class="seller-info">
+
+                                <h3>
+                                    {{ seller.username }}
+                                </h3>
+
+                                <span>
+                                    Seller
+                                </span>
+
+                            </div>
+
+
+                            <div class="seller-status">
+                                Active
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        S
+                    </div>
+
+                    <h3>No Sellers Yet</h3>
+
+                    <p>
+                        Add a seller account to start making sales.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="add-btn"
+                        onclick="openSellerForm()"
+                    >
+                        + Add Seller
+                    </button>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+
+    <footer class="footer">
+        <p>Shop System &copy; 2026</p>
+    </footer>
+
+</div>
+
+
+<script>
+
+    function openSellerForm() {
+        document
+            .getElementById("sellerForm")
+            .classList.remove("hidden");
+    }
+
+    function closeSellerForm() {
+        document
+            .getElementById("sellerForm")
+            .classList.add("hidden");
+    }
+
+</script>
+
+</body>
+</html>

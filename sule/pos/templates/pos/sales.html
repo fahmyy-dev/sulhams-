@@ -1,0 +1,294 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sales | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/sales.css' %}">
+</head>
+
+
+<body>
+
+    <header class="topbar">
+
+        <div class="brand">
+            <div class="brand-icon">S</div>
+
+            <div>
+                <h2>SHOP SYSTEM</h2>
+                <span>Sales Management</span>
+            </div>
+        </div>
+
+        <div class="user-area">
+
+            <div class="user-info">
+                <strong>{{ request.user.username }}</strong>
+                <span>Seller / Owner</span>
+            </div>
+
+            <a href="{% url 'logout' %}" class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="sales-container">
+
+        <div class="page-header">
+
+            <div>
+                <span class="page-label">SALES MANAGEMENT</span>
+                <h1>Sales Records</h1>
+                <p>View and manage recorded sales.</p>
+            </div>
+            <a href="#"></a>
+            <a href="#"></a>
+             <a href="{% url 'agency' %}" class="new-sale-btn">Agency</a>
+            <a href="{% url 'expenses' %}" class="new-sale-btn">+ Add expenses</a>
+            <a href="{% url 'new_sales' %}" class="new-sale-btn">
+                + New Sale
+            </a>
+            <a href="{% url 'owner_dashboard' %}" class="new-sale-btn">Dashboard</a>
+
+        </div>
+
+
+        <section class="summary-cards">
+           
+
+            <div class="summary-card">
+                <span>Total Sales</span>
+                <strong>TSh {{total_sales|default:"0"}}</strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Today's Sales</span>
+                <strong>TSH {{today_sales|default:"0"}}</strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Today's Profit</span>
+                <strong>TSh {{today_profit|default:"0"}}</strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Transactions</span>
+                <strong>{{transaction_count|default:"0"}}</strong>
+            </div>
+
+        </section>
+
+
+        <section class="sales-panel">
+
+            <div class="panel-header">
+
+
+                <div>
+                    <h2>Sales History</h2>
+                    <p>All recorded transactions</p>
+                </div>
+                 <br><a href="{% url 'sales'%}" class="new-sale-btn">Reset</a>
+                  
+                 <form method="GET" class="filters">
+
+                   
+
+                   
+
+                   
+
+                    <input type="date"
+                           name="date_from"
+                           value="{{request.GET.date_from}}"
+                    >
+                    <span><strong>date from</strong></span>
+                    <input type="date"
+                           name="date_to"
+                           value="{{request.GET.date_to}}"
+                    >
+                     <span><strong> date to</strong></span>
+                     
+                     <select>
+                        <option value="">All Payment Methods</option>
+                        <option value="CASH" {% if request.GET.payment == 'CASH' %}selected{% endif %}>Cash</option>
+                        
+                    </select>
+
+                    <button type="submit">
+                        Search
+                    </button>
+                 </form>  
+                
+             <input
+                        type="text"
+                        name="search"
+                        placeholder="Search product..."
+                        id="liveSearchInput"
+                    >              
+                
+            
+            </div>
+            
+
+
+            <div class="table-wrapper">
+
+                <table id="saletble">
+
+                    <thead>
+                        <tr>
+                            <th>Sale No.</th>
+                            <th>Product</th>
+                            <th>Code</th>
+                            <th>Qty</th>
+                            <th>Selling Price</th>
+                            <th>Total</th>
+                            <th>Profit</th>
+                            <th>Seller</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for sale in sales %}
+
+                        <tr>
+
+                            <td>#{{ sale.id }}</td>
+
+                            <td>
+                                <strong>
+                                
+                                  {% for item in sale.items.all %}   
+                                    {{ item.product.name }}{% if not forloop.last %}, {%endif %}
+                                    {% empty %}
+                                   {% endfor %}    
+                                 
+                                
+                                </strong>
+
+                                <small>
+                                    
+                                    {{ sale.product.brand }}
+                                    
+                                </small>
+                            </td>
+
+                            <td>
+                             
+                                {% for item in sale.items.all %}   
+                                    {{ item.product.code }}{% if not forloop.last %}, {%endif %}
+                                    {% empty %}
+                                {% endfor %} 
+                               
+
+                                
+                            </td>
+
+                            <td>
+                                
+                                 {% for item in sale.items.all %}   
+                                    {{ item.quantity }}{% if not forloop.last %}, {%endif %}
+                                    {% empty %}
+                                 {% endfor %}
+                                  
+                                
+                            </td>
+
+                            <td>
+                             
+                                {% for item in sale.items.all %}   
+                                  Tsh  {{ item.selling_price }}{% if not forloop.last %}, {%endif %}
+                                    {% empty %}
+                                 {% endfor %}   
+                               
+                            </td>
+
+                            <td class="total">
+                                TSh {{ sale.total }}
+                            </td>
+
+                            <td class="profit">
+                              
+                                {% for item in sale.items.all %}   
+                                  Tsh  {{ item.profit }}{% if not forloop.last %}, {%endif %}
+                                    {% empty %}
+                                 {% endfor %}  
+                                  
+                                
+                            </td>
+
+                            <td>
+                                {{ sale.seller.username }}
+                            </td>
+
+                            <td>
+                                {{ sale.created_at|date:"d/m/Y H:i" }}
+                            </td>
+
+                            <td>
+                                <a
+                                    href="{% url 'sale_detail' sale.id %}"
+                                    class="view-btn">
+                                
+                                    View</a>
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="10" class="empty-state">
+                                No sales recorded yet.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById('liveSearchInput');
+        
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const term = searchInput.value.toLowerCase().trim();
+                
+                // Inatafuta rows zote ndani ya tbody ya jedwali lenye id="saletble"
+                const rows = document.querySelectorAll('#saletble tbody tr');
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        row.style.display = ""; // Ionyeshe kama imepatikana
+                    } else {
+                        row.style.display = "none"; // Ifiche kama haimo
+                    }
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>

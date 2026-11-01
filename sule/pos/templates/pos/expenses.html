@@ -1,0 +1,501 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Expenses | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/expenses.css' %}">
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+        <div class="brand">
+            <div class="brand-logo">S</div>
+
+            <div>
+                <h2>SHOP SYSTEM</h2>
+                <span>Owner Panel</span>
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="topbar-right">
+
+            <span class="username">
+                {{ request.user.username }}
+            </span>
+
+            <a href="{% url 'owner_dashboard' %}" class="back-btn">
+                Dashboard
+            </a>
+
+            <a href="{% url 'logout' %}" class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="main-content">
+
+        <!-- PAGE HEADING -->
+        <div class="page-heading">
+
+            <div>
+                <span class="page-label">
+                    FINANCIAL MANAGEMENT
+                </span>
+
+                <h1>Expenses</h1>
+
+                <p>
+                    Record, monitor and manage your business expenses.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="add-btn"
+                onclick="openExpenseForm()"
+            >
+                + Add Expense
+            </button>
+
+        </div>
+
+
+        <!-- SUMMARY CARDS -->
+        <section class="summary-cards-grid">
+
+            <div class="summary-card">
+                <div class="summary-icon orange-icon">
+                    <span>↗</span>
+                </div>
+
+                <div>
+                    <span class="card-label">
+                        Total Expenses
+                    </span>
+
+                    <h3 class="card-value">
+                        TSh {{ total_expenses }}
+                    </h3>
+
+                    <small>Selected period</small>
+                </div>
+            </div>
+
+
+            <div class="summary-card">
+                <div class="summary-icon dark-icon">
+                    <span>◷</span>
+                </div>
+
+                <div>
+                    <span class="card-label">
+                        Today's Expenses
+                    </span>
+
+                    <h3 class="card-value">
+                        TSh {{ today_expenses }}
+                    </h3>
+
+                    <small>Expenses recorded today</small>
+                </div>
+            </div>
+
+
+            <div class="summary-card">
+                <div class="summary-icon green-icon">
+                    <span>#</span>
+                </div>
+
+                <div>
+                    <span class="card-label">
+                        Recorded Expenses
+                    </span>
+
+                    <h3 class="card-value">
+                        {{ expenses_count }}
+                    </h3>
+
+                    <small>Total expense records</small>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ADD EXPENSE FORM -->
+        <section id="expenseForm" class="form-card hidden">
+
+            <div class="form-header">
+
+                <div>
+                    <h2>Record New Expense</h2>
+
+                    <p>
+                        Enter the details of your business expense.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="close-btn"
+                    onclick="closeExpenseForm()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form method="POST" action="{% url 'expenses' %}">
+
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Title / Item Name</label>
+
+                        <input
+                            type="text"
+                            name="title"
+                            placeholder="e.g. Rent, Electricity"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Amount (TSh)</label>
+
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            name="amount"
+                            placeholder="0.00"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Category</label>
+
+                        <input
+                            type="text"
+                            name="category"
+                            placeholder="e.g. Utility, Transport"
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Date</label>
+
+                        <input
+                            type="date"
+                            name="date"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+
+                <div class="form-group description-group">
+
+                    <label>Description / Notes</label>
+
+                    <input
+                        type="text"
+                        name="description"
+                        placeholder="Optional details..."
+                    >
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        onclick="closeExpenseForm()"
+                    >
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="save-btn">
+                        Save Expense
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- FILTER SECTION -->
+        <section class="filter-card">
+
+            <div class="filter-heading">
+                <div>
+                    <h2>Filter Expenses</h2>
+
+                    <p>
+                        Find expenses using a period or date range.
+                    </p>
+                </div>
+            </div>
+
+
+            <form method="GET" action="{% url 'expenses' %}" class="filter-form">
+
+                <div class="filter-group">
+
+                    <label>Period Filter</label>
+
+                    <select name="period" class="filter-control">
+
+                        <option value="">All Periods</option>
+
+                        <option
+                            value="day"
+                            {% if request.GET.period == 'day' %}selected{% endif %}
+                        >
+                            Today
+                        </option>
+
+                        <option
+                            value="week"
+                            {% if request.GET.period == 'week' %}selected{% endif %}
+                        >
+                            This Week
+                        </option>
+
+                        <option
+                            value="month"
+                            {% if request.GET.period == 'month' %}selected{% endif %}
+                        >
+                            This Month
+                        </option>
+
+                        <option
+                            value="year"
+                            {% if request.GET.period == 'year' %}selected{% endif %}
+                        >
+                            This Year
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label>From Date</label>
+
+                    <input
+                        type="date"
+                        name="start_date"
+                        value="{{ request.GET.start_date }}"
+                        class="filter-control"
+                    >
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label>To Date</label>
+
+                    <input
+                        type="date"
+                        name="end_date"
+                        value="{{ request.GET.end_date }}"
+                        class="filter-control"
+                    >
+
+                </div>
+
+
+                <div class="filter-actions">
+
+                    <button type="submit" class="filter-btn">
+                        Filter
+                    </button>
+
+                    <a href="{% url 'expenses' %}" class="reset-btn">
+                        Reset
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- EXPENSES TABLE -->
+        <section class="content-card">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>All Expenses</h2>
+
+                    <p>
+                        {{ expenses_count }} recorded expenses
+                    </p>
+                </div>
+
+            </div>
+
+
+            {% if expenses %}
+
+                <div class="table-wrapper">
+
+                    <table class="expenses-table">
+
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Expense Title</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Recorded By</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for exp in expenses %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ exp.date|date:"d/m/Y" }}
+                                    </td>
+
+                                    <td>
+                                        <strong>{{ exp.title }}</strong>
+                                    </td>
+
+                                    <td>
+                                        {{ exp.category|default:"-" }}
+                                    </td>
+
+                                    <td class="amount-text">
+                                        TSh {{ exp.amount }}
+                                    </td>
+
+                                    <td>
+                                        {{ exp.created_by.username|default:"Admin" }}
+                                    </td>
+
+                                    <td class="notes-cell">
+                                        {{ exp.description|default:"-" }}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">E</div>
+
+                    <h3>No Expenses Found</h3>
+
+                    <p>
+                        No expense records found for the selected period.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="add-btn"
+                        onclick="openExpenseForm()"
+                    >
+                        + Add Expense
+                    </button>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>Shop System &copy; 2026</p>
+    </footer>
+
+</div>
+
+
+<script>
+
+    function openExpenseForm() {
+        document
+            .getElementById("expenseForm")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("expenseForm")
+            .scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+    }
+
+
+    function closeExpenseForm() {
+        document
+            .getElementById("expenseForm")
+            .classList.add("hidden");
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,493 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard | Shop System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    
+    <link rel="stylesheet" href="{% static 'pos/dashboard.css' %}">
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+
+    <aside class="sidebar" id="sideMenu">
+        
+        <div class="brand">
+             
+
+            
+
+            <div class="brand-text">
+                <h2>SHOP SYSTEM</h2>
+                <span>Cosmetics Management</span>
+               
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+           <a href="#" class="nav-link active">
+    <span><i class="fa-solid fa-house"></i></span>
+    <span>Dashboard</span>
+</a>
+
+<a href="{% url 'products' %}" class="nav-link">
+    <span><i class="fa-solid fa-box"></i></span>
+    <span>Products</span>
+</a>
+
+<a href="{% url 'categories' %}" class="nav-link">
+    <span><i class="fa-solid fa-layer-group"></i></span>
+    <span>Categories</span>
+</a>
+
+<a href="{% url 'sales' %}" class="nav-link">
+    <span><i class="fa-solid fa-cart-shopping"></i></span>
+    <span>Sales</span>
+</a>
+
+<a href="{% url 'expenses' %}" class="nav-link">
+    <span><i class="fa-solid fa-receipt"></i></span>
+    <span>Expenses</span>
+</a>
+
+<a href="{% url 'loans' %}" class="nav-link">
+    <span><i class="fa-solid fa-hand-holding-dollar"></i></span>
+    <span>Loans</span>
+</a>
+<a href="{% url 'agency' %}" class="nav-link">
+    <span><i class="fa-solid fa-mobile-screen-button"></i></span>
+    <span>Agency</span>
+</a>
+
+<a href="{% url 'reports' %}" class="nav-link">
+    <span><i class="fa-solid fa-chart-pie"></i></span>
+    <span>Reports</span>
+</a>
+
+<a href="{% url 'sellers' %}" class="nav-link">
+    <span><i class="fa-solid fa-users"></i></span>
+    <span>Sellers</span>
+</a>
+             
+            
+            
+
+        </nav>
+
+        <div class="sidebar-bottom">
+       
+
+            <div class="owner-box">
+                <div class="owner-avatar">O</div>
+
+                <div>
+                    <strong>{{ request.user.username }}</strong>
+                    <span>Owner</span>
+                </div>
+            </div>
+
+            <a href="{% url 'logout' %}" class="logout-link">
+                <span>↪</span>
+                Logout
+            </a>
+            
+
+        </div>
+
+    </aside>
+ <div id="overlay"></div>
+
+
+    <main class="main-content">
+
+        <header class="top-header">
+
+            <div>
+                <span class="page-label">OWNER PANEL</span>
+                <h1>Dashboard</h1>
+                <p>Manage and monitor your cosmetics shop.</p>
+            </div>
+
+            <div class="header-actions">
+
+            </a>
+                <a href="{% url 'sales' %}" class="new-sale-btn">Sales History</a>
+                <a href="{% url 'new_sales' %}" class="new-sale-btn">
+                    + New Sale
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <section class="summary-grid">
+
+            <div class="summary-card sales-card">
+
+                <div class="card-icon">
+                    TS
+                </div>
+
+                <div class="card-content">
+                    <span>Total Sales</span>
+                    <h2>TSh {{ total_sales|default:"0" }}</h2>
+                    <small>All recorded sales</small>
+                </div>
+
+            </div>
+             <div class="summary-card sales-card">
+
+                <div class="card-icon">
+                    TE
+                </div>
+
+                <div class="card-content">
+                    <span>Total Expenses</span>
+                    <h2>TSh {{ total_expenses|default:"0" }}</h2>
+                    <small>All recorded expenses</small>
+                </div>
+
+            </div>
+
+
+            <div class="summary-card profit-card">
+
+                <div class="card-icon">
+                    ₱
+                </div>
+
+                <div class="card-content">
+                    <span>Total Profit</span>
+                    <h2>TSh {{ total_profit|default:"0" }}</h2>
+                    <small>Profit from sales</small>
+                </div>
+
+            </div>
+              <div class="summary-card profit-card">
+
+                <div class="card-icon">
+                    ₱
+                </div>
+
+                <div class="card-content">
+                    <span>Total Net Profit</span>
+                    <h2>TSh {{ total_net_profit|default:"0" }}</h2>
+                    <small>Net Profit from sales</small>
+                </div>
+
+            </div>
+
+               <div class="summary-card sales-card">
+
+                <div class="card-icon">
+                    TL
+                </div>
+
+                <div class="card-content">
+                    <span>Total Loans</span>
+                    <h2>TSh {{ total_loans|default:"0" }}</h2>
+                    <small>All recorded Loans</small>
+                </div>
+
+            </div>
+            <div class="summary-card products-card">
+
+                <div class="card-icon">
+                    P
+                </div>
+
+                <div class="card-content">
+                    <span>Products</span>
+                    <h2>{{ product_count|default:"0" }}</h2>
+                    <small>Products in system</small>
+                </div>
+
+            </div>
+
+
+            <div class="summary-card stock-card">
+
+                <div class="card-icon">
+                    S
+                </div>
+
+               <section class="low-stock-section">
+
+    <div class="section-header">
+        <div>
+            <h2>Low Stock Alert</h2>
+            <p>Products with 5 or fewer items remaining.</p>
+        </div>
+
+        {% if low_stock_products %}
+            <span class="alert-count">
+                {{ low_stock_products|length }} Alert{{ low_stock_products|length|pluralize }}
+            </span>
+        {% else %}
+            <span class="stock-ok">
+                Stock OK
+            </span>
+        {% endif %}
+    </div>
+
+    {% if low_stock_products %}
+
+        <div class="stock-alert-list">
+
+            {% for product in low_stock_products %}
+
+                <div class="stock-alert-item">
+
+                    <div class="stock-product-info">
+                        <div class="stock-icon">
+                            ⚠
+                        </div>
+
+                        <div>
+                            <strong>{{ product.name }}</strong>
+                            <span>{{ product.brand }}</span>
+                        </div>
+                    </div>
+
+                    <div class="stock-remaining
+                        {% if product.stock_quantity == 0 %}
+                            out-of-stock
+                        {% else %}
+                            low-stock
+                        {% endif %}
+                    ">
+
+                        {% if product.stock_quantity == 0 %}
+                            Out of Stock
+                        {% else %}
+                            {{ product.stock_quantity }} remaining
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="no-stock-alert">
+            <div class="success-icon">✓</div>
+
+            <div>
+                <strong>All stock levels are good</strong>
+                <p>No product has reached the low-stock level.</p>
+            </div>
+        </div>
+
+    {% endif %}
+
+</section>
+
+            </div>
+
+        </section>
+
+
+        <section class="overview-grid">
+
+            <div class="overview-card">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="section-label">SALES OVERVIEW</span>
+                        <h2>Business Performance</h2>
+                    </div>
+
+                    <a href="{% url 'sales' %}" class="view-link">
+                        View Sales →
+                    </a>
+
+                </div>
+
+                <div class="period-grid">
+
+                    <div class="period-box">
+                        <span>Today</span>
+                        <strong>TSh {{ today_sales|default:"0" }}</strong>
+                    </div>
+
+                    <div class="period-box">
+                        <span>This Week</span>
+                        <strong>TSh {{ week_sales|default:"0" }}</strong>
+                    </div>
+
+                    <div class="period-box">
+                        <span>This Month</span>
+                        <strong>TSh {{ month_sales|default:"0" }}</strong>
+                    </div>
+
+                    <div class="period-box">
+                        <span>This Year</span>
+                        <strong>TSh {{ year_sales|default:"0" }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-card">
+
+                <div class="section-heading">
+                    <div>
+                        <span class="section-label">QUICK ACTIONS</span>
+                        <h2>Manage Shop</h2>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+
+                    <a href="{% url 'products' %}" class="quick-action">
+                        <span>+</span> 
+                        <div>
+                            <strong>Add Product</strong>
+                            <small>Create a new product</small>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'categories' %}" class="quick-action">
+                        <span>+</span>
+                        <div>
+                            <strong>Add Category</strong>
+                            <small>Create product category</small>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'sellers' %}" class="quick-action">
+                        <span>+</span>
+                        <div>
+                            <strong>Add Seller</strong>
+                            <small>Create seller account</small>
+                        </div>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="content-grid">
+
+            <div class="content-card">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="section-label">RECENT SALES</span>
+                        <h2>Latest Transactions</h2>
+                    </div>
+
+                    <a href="{% url 'sales' %}#saletble" class="view-link">
+                        View All →
+                    </a>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Sale No.</th>
+                                <th>Seller</th>
+                                <th>Payment</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                                <th>form-actions</th>
+                                
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for sale in recent_sales %}
+
+                            <tr>
+
+                                <td>
+                                    <strong>{{ sale.sale_number }}</strong>
+                                </td>
+
+                                <td>
+                                    {{ sale.seller.username }}
+                                </td>
+
+                                <td>
+                                    <span class="payment-badge">
+                                        {{ sale.get_payment_method_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <strong>TSh {{ sale.total }}</strong>
+                                </td>
+
+                                <td>
+                                    {{ sale.created_at|date:"d/m/Y H:i" }}
+                                </td>
+
+                                <td>
+                                    <a href="{% url 'sale_detail' sale.id %}" class="table-view">
+                                        View
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+                                <td colspan="6" class="empty-row">
+                                    No sales recorded yet.
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+           
+
+        </section>
+
+
+        <footer class="dashboard-footer">
+            <p>Shop System • Cosmetics Management</p>
+            <span>Owner Dashboard</span>
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+</html>

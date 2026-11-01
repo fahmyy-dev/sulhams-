@@ -1,0 +1,530 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Sale | Shop System</title>
+    <link rel="stylesheet" href="{% static 'pos/newsale.css' %}">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <div class="logo">S</div>
+
+        <div>
+            <h2>SHOP SYSTEM</h2>
+            <span>Sales Management</span>
+        </div>
+    </div>
+
+    <div class="user-area">
+        <div>
+            <strong>{{ request.user.username }}</strong>
+            <small>Seller</small>
+        </div>
+
+        <a href="{% url 'logout' %}" class="logout">Logout</a>
+    </div>
+</header>
+
+ {% if messages %}
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+<main class="container">
+
+    <div class="page-header">
+
+        <div>
+            <span class="section-label">SALES MANAGEMENT</span>
+            <h1>New Sale</h1>
+            <p>Record products sold by the seller.</p>
+        </div>
+
+        <a href="{% url 'sales' %}" class="back-btn">
+            ← Sales History
+        </a>
+
+    </div>
+
+
+    <form method="POST" action="{% url 'new_sales' %}" id="saleForm">
+
+        {% csrf_token %}
+
+        <section class="sale-card">
+
+            <div class="card-title">
+                <div>
+                    <h2>Add Products</h2>
+                    <p>Search and select products sold to the customer.</p>
+                </div>
+            </div>
+
+
+            <div class="filters">
+
+                <div class="search-box">
+                    <label>Search Product</label>
+
+                    <div class="input-icon">
+                        
+
+                        <input
+                            type="text"
+                            id="productSearch"
+                            placeholder="Search product, brand or code..."
+                            autocomplete="off"
+                        >
+                    </div>
+                </div>
+
+
+                <div class="filter-box">
+                    <label>Category</label>
+
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+
+                <div class="date-box">
+                    <label>Sale Date</label>
+
+                    <input
+                        type="date"
+                        name="sale_date"
+                        value="{{ today|date:'Y-m-d' }}"
+                        required
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="product-list" id="productList">
+
+                {% for product in products %}
+
+                <div
+                    class="product-item"
+                    data-name="{{ product.name|lower }}"
+                    data-brand="{{ product.brand|lower }}"
+                    data-code="{{ product.code|lower }}"
+                    data-category="{{ product.category.id }}"
+                    data-id="{{ product.id }}"
+                    data-price="{{ product.selling_price }}"
+                >
+
+                    <div class="product-info">
+
+                        <div class="product-icon">
+                            {{ product.name|first|upper }}
+                        </div>
+
+                        <div>
+                            <h3>{{ product.name }}</h3>
+
+                            <p>
+                                {{ product.brand }}
+                                {% if product.size %}
+                                    · {{ product.size }}
+                                {% endif %}
+                            </p>
+
+                            <span class="product-code">
+                                Code: {{ product.code }}
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="product-right">
+
+                        <strong>
+                            TSh {{ product.selling_price }}
+                        </strong>
+
+                        <span class="stock">
+                            Stock: {{ product.stock_quantity }}
+                        </span>
+
+                        <button
+                            type="button"
+                            class="add-btn"
+                            onclick="addProduct(this)">
+                        
+                            + Add
+                        </button>
+
+                    </div>
+
+                </div>
+
+                {% empty %}
+
+                <div class="empty-products">
+                    <div>📦</div>
+                    <h3>No products available</h3>
+                    <p>Products added by the owner will appear here.</p>
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <section class="cart-card">
+
+            <div class="card-title">
+                <div>
+                    <h2>Selected Products</h2>
+                    <p>Products included in this sale.</p>
+                </div>
+
+                <span class="items-count" id="itemsCount">
+                    0 Items
+                </span>
+            </div>
+
+
+            <div class="cart-table">
+
+                <div class="cart-head">
+                    <span>PRODUCT</span>
+                    <span>PRICE</span>
+                    <span>QUANTITY</span>
+                    <span>TOTAL</span>
+                    <span></span>
+                </div>
+
+                <div id="cartItems">
+
+                    <div class="empty-cart" id="emptyCart">
+                        <div>🛒</div>
+                        <h3>No products selected</h3>
+                        <p>Search for a product above and click Add.</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="sale-bottom">
+
+                <div class="payment">
+
+                    <label>Payment Method</label>
+
+                    <select name="payment_method" required>
+                        <option value="">Select payment method</option>
+                        <option value="cash">Cash</option>
+                        <option value="mobile">Mobile Money</option>
+                        <option value="card">Card</option>
+                    </select>
+
+                </div>
+
+
+                <div class="summary">
+
+                    <div>
+                        <span>Subtotal</span>
+                        <strong id="subtotal">TSh 0</strong>
+                    </div>
+                    <div class="summay-row">
+                        <span>Discount</span>
+                        <input 
+                          type="number"
+                          id="discount"
+                          name="discount"
+                          min="0"
+                          step="0.01"
+                          value="0"
+                          placeholder="0"
+                          oninput="renderCart()">
+                    </div>
+
+                    <div class="grand-total">
+                        <span>Total</span>
+                        <strong id="grandTotal">TSh 0</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a href="{% url 'sales' %}" class="cancel-btn">
+                    Cancel
+                </a>
+
+                <button type="submit" class="submit-btn">
+                    Submit Sale →
+                </button>
+
+            </div>
+
+        </section>
+
+    </form>
+
+</main>
+
+
+<script>
+
+const selectedProducts = {};
+
+function addProduct(button) {
+
+    const item = button.closest(".product-item");
+
+    const id = item.dataset.id;
+    const name = item.querySelector("h3").innerText;
+    const price = parseInt(item.dataset.price);
+
+    if (selectedProducts[id]) {
+
+        selectedProducts[id].quantity += 1;
+
+    } else {
+
+        selectedProducts[id] = {
+            id: id,
+            name: name,
+            price: price,
+            quantity: 1
+        };
+
+    }
+
+    renderCart();
+}
+
+
+function removeProduct(id) {
+
+    delete selectedProducts[id];
+
+    renderCart();
+}
+
+
+function changeQuantity(id, value) {
+
+    let quantity = parseInt(value);
+
+    if (quantity < 1) {
+        quantity = 1;
+    }
+
+    selectedProducts[id].quantity = quantity;
+
+    renderCart();
+}
+
+
+function renderCart() {
+
+    const cart = document.getElementById("cartItems");
+    const empty = document.getElementById("emptyCart");
+
+    cart.innerHTML = "";
+
+    const products = Object.values(selectedProducts);
+
+    document.getElementById("itemsCount").innerText =
+        products.length + (products.length === 1 ? " Item" : " Items");
+
+
+    if (products.length === 0) {
+
+        cart.appendChild(empty);
+
+        document.getElementById("subtotal").innerText = "TSh 0";
+        document.getElementById("grandTotal").innerText = "TSh 0";
+
+        return;
+    }
+
+
+    let total = 0;
+
+
+    products.forEach(product => {
+
+        const itemTotal = product.price * product.quantity;
+
+        total += itemTotal;
+
+
+        const row = document.createElement("div");
+
+        row.className = "cart-row";
+
+        row.innerHTML = `
+
+            <div class="cart-product">
+                <div class="mini-logo">
+                    ${product.name.charAt(0).toUpperCase()}
+                </div>
+
+                <strong>${product.name}</strong>
+            </div>
+
+            <span>
+                TSh ${product.price.toLocaleString()}
+            </span>
+
+            <div class="quantity-control">
+
+                <button
+                    type="button"
+                    onclick="changeQuantity('${product.id}', ${product.quantity - 1})">
+                    −
+                </button>
+
+                <input
+                    type="number"
+                    min="1"
+                    value="${product.quantity}"
+                    onchange="changeQuantity('${product.id}', this.value)"
+                >
+
+                <button
+                    type="button"
+                    onclick="changeQuantity('${product.id}', ${product.quantity + 1})">
+                    +
+                </button>
+
+            </div>
+
+            <strong>
+                TSh ${itemTotal.toLocaleString()}
+            </strong>
+
+            <button
+                type="button"
+                class="delete-btn"
+                onclick="removeProduct('${product.id}')">
+                ×
+            </button>
+
+            <input
+                type="hidden"
+                name="product_id[]"
+                value="${product.id}"
+            >
+
+            <input
+                type="hidden"
+                name="quantity[]"
+                value="${product.quantity}"
+            >
+
+        `;
+
+        cart.appendChild(row);
+
+    });
+
+
+    document.getElementById("subtotal").innerText =
+        "TSh " + total.toLocaleString();
+        const discountInput=document.getElementById("discount");
+        let discount=parseInt(discountInput.value) || 0;
+        if (discount>total){
+            discount=total;
+            discountInput.value= total;
+
+        }
+        const grandTotal=total-discount;
+
+    document.getElementById("grandTotal").innerText =
+        "TSh " + grandTotal.toLocaleString();
+}
+
+
+const searchInput = document.getElementById("productSearch");
+const categoryFilter = document.getElementById("categoryFilter");
+
+
+function filterProducts() {
+    
+    const search = searchInput.value.toLowerCase().trim();
+    const category = categoryFilter.value;
+
+    const products = document.querySelectorAll(".product-item");
+
+
+    products.forEach(product => {
+
+        const name = product.dataset.name;
+        const brand = product.dataset.brand;
+        const code = product.dataset.code;
+        const productCategory = product.dataset.category;
+
+
+        const matchesSearch =
+            name.includes(search) ||
+            brand.includes(search) ||
+            code.includes(search);
+
+
+        const matchesCategory =
+            category === "" ||
+            productCategory === category;
+
+
+        product.style.display =
+            matchesSearch && matchesCategory
+                ? "flex"
+                : "none";
+
+    });
+
+}
+
+
+searchInput.addEventListener("input", filterProducts);
+categoryFilter.addEventListener("change", filterProducts);
+document.getElementById("discount").addEventListener("input",renderCart());
+
+document.getElementById("saleForm").addEventListener("submit", function(event) {
+
+    if (Object.keys(selectedProducts).length === 0) {
+
+        event.preventDefault();
+
+        alert("Please add at least one product.");
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

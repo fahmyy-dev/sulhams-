@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/home.css' %}">
+</head>
+
+<body>
+
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="{% static 'videos/shop-background.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <div class="video-overlay"></div>
+
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">S</span>
+            <span>SHOP SYSTEM</span>
+        </div>
+
+        <nav class="nav-links">
+            
+
+            {% if request.user.is_authenticated and request.user.profile.role == 'OWNER' %}
+                <a href="{% url 'owner_dashboard' %}">Dashboard</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="split-layout">
+         {% if messages %}
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+
+        <!-- LEFT SIDE: HOME DETAILS -->
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="badge">
+                    COSMETICS SHOP MANAGEMENT
+                </div>
+
+                <h1>
+                    Manage Your Shop
+                    <span>Smarter & Faster.</span>
+                </h1>
+
+                <p>
+                    Manage products, sales, stock and business information
+                    easily from one simple system.
+                </p>
+
+                <div class="hero-buttons">
+                     <a href="{% url 'login' %}#log " class="btn btn-secondary">
+                        Login
+                    </a>
+                    
+
+                    {% if request.user.is_authenticated and request.user.profile.role == 'OWNER' %}
+                        <a href="{% url 'owner_dashboard' %}" class="btn btn-primary">
+                            Dashboard <span>→</span>
+                        </a>
+                    {% endif %}
+
+                </div>
+
+                <div class="home-details">
+                    <div class="detail-item">
+                        <h3>Products</h3>
+                        <p>Manage your shop products.</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <h3>Sales</h3>
+                        <p>Keep track of daily sales.</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <h3>Stock</h3>
+                        <p>Monitor your inventory.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- RIGHT SIDE: LOGIN -->
+        <section class="login-page" id="log">
+
+           
+            <div class="login-card">
+
+                <div class="brand">
+                    <div class="brand-icon">S</div>
+                    <div>
+                        <h2>SHOP SYSTEM</h2>
+                        <p>Cosmetics Management</p>
+                    </div>
+                </div>
+
+                <div class="login-heading">
+                    <h1>Welcome Back</h1>
+                    <p>Login to access your account</p>
+                </div>
+
+                <form method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Enter your username"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="login-button">
+                        Login
+                        <span>→</span>
+                    </button>
+
+                </form>
+
+                <div class="login-footer">
+                    <p>Authorized users only</p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 Shop System</p>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            BIN HAMZA
+        </div>
+    </footer>
+
+</body>
+</html>

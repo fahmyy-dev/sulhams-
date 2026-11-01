@@ -1,0 +1,225 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sale Details | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/saledetails.css' %}">
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="logo">S</div>
+
+        <div>
+            <h2>SHOP SYSTEM</h2>
+            <span>Sales Management</span>
+        </div>
+
+    </div>
+
+
+    <div class="user-area">
+
+        <div>
+            <strong>{{ request.user.username }}</strong>
+            <small>Seller</small>
+        </div>
+
+        <a href="{% url 'logout' %}">
+            Logout
+        </a>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <div class="page-header">
+
+        <div>
+            <span>SALES MANAGEMENT</span>
+            <h1>Sale Details</h1>
+            <p>Transaction receipt and sale information.</p>
+        </div>
+
+        <a href="{% url 'sales' %}" class="history-btn">
+            ← Sales History
+        </a>
+
+    </div>
+
+
+    <section class="receipt">
+
+        <div class="receipt-header">
+
+            <div class="receipt-logo">
+                S
+            </div>
+
+            <h2>SHOP SYSTEM</h2>
+
+            <p>Sales Management</p>
+
+            <div class="success">
+                ✓ Sale Completed
+            </div>
+
+        </div>
+
+
+        <div class="sale-number">
+
+            <div>
+                <span>SALE NUMBER</span>
+                <strong>{{ sale.sale_number }}</strong>
+            </div>
+
+            <div>
+                <span>DATE & TIME</span>
+                <strong>
+                    {{ sale.created_at|date:"d/m/Y H:i" }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="seller-info">
+
+            <div>
+                <span>SELLER</span>
+                <strong>{{ sale.seller.username }}</strong>
+            </div>
+
+            <div>
+                <span>PAYMENT METHOD</span>
+                <strong>{{ sale.payment_method }}</strong>
+            </div>
+
+        </div>
+
+
+        <div class="products">
+
+            <div class="table-head">
+
+                <span>PRODUCT</span>
+                <span>QTY</span>
+                <span>PRICE</span>
+                <span>TOTAL</span>
+
+            </div>
+
+
+            {% for item in items %}
+
+            <div class="product-row">
+
+                <div class="product-name">
+
+                    <strong>
+                        {{ item.product.name }}
+                    </strong>
+
+                    <small>
+                        {{ item.product.brand }}
+
+                        {% if item.product.size %}
+                            · {{ item.product.size }}
+                        {% endif %}
+
+                        <br>
+
+                        Code: {{ item.product.code }}
+                    </small>
+
+                </div>
+
+                <span>
+                    {{ item.quantity }}
+                </span>
+
+                <span>
+                    TSh {{ item.selling_price }}
+                </span>
+
+                <strong>
+                    TSh {{ item.total }}
+                </strong>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="totals">
+
+            <div>
+                <span>Total Items</span>
+                <strong>{{ total_items }}</strong>
+            </div>
+            <div>
+                <span>Subtotal</span>
+                <strong>{{sale.subtotal}}</strong>
+            </div> 
+            <div>
+                <span>Discount</span>
+                <strong>{{sale.discount}}</strong>
+            </div>
+            <div class="total-row">
+                <span>TOTAL</span>
+                <strong>
+                    TSh {{ sale.total }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="receipt-footer">
+
+            <h3>Thank You!</h3>
+
+            <p>
+                Thank you for your purchase.
+            </p>
+
+            <small>
+                This is a digital sale record.
+            </small>
+
+        </div>
+
+    </section>
+
+
+    <div class="bottom-actions">
+
+        <a href="{% url 'sales' %}" class="secondary-btn">
+            ← View Sales History
+        </a>
+
+        <a href="{% url 'new_sales' %}" class="primary-btn">
+            + New Sale
+        </a>
+
+    </div>
+
+</main>
+
+</body>
+</html>

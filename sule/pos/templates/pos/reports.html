@@ -1,0 +1,267 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Reports | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/report.css' %}"
+        
+    >
+
+</head>
+
+
+<body>
+
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                S
+            </div>
+
+            <div>
+                <h2>SHOP SYSTEM</h2>
+                <span>Owner Panel</span>
+            </div>
+
+        </div>
+         {% if messages %}
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+        <div class="topbar-right">
+
+            <span class="username">
+                {{ request.user.username }}
+            </span>
+
+            <a href="{% url 'owner_dashboard' %}" class="back-btn">
+                Dashboard
+            </a>
+
+            <a href="{% url 'logout' %}" class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+<div class="reports-page">
+
+
+   
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+
+        <!-- TOP -->
+
+        <div class="top-section">
+
+            <div>
+
+                <span class="page-label">
+                    BUSINESS REPORTS
+                </span>
+
+                <h1>Reports</h1>
+
+                <p>
+                    View and analyze your shop sales performance.
+                </p>
+
+            </div>
+            
+           
+
+
+            <a
+                href="{% url 'sales' %}"
+                class="new-sale-btn"
+            >
+                view sales history
+            </a>
+
+        </div>
+
+
+
+        <!-- REPORT PERIODS -->
+
+        <section class="period-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>Sales Reports</h2>
+
+                    <p>
+                        Select a period to view business performance.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="period-grid">
+
+
+                <!-- DAY -->
+
+                <div class="period-card">
+
+                    <div class="period-icon">
+                        D
+                    </div>
+
+                    <div class="period-content">
+
+                        <span>DAILY REPORT</span>
+
+                        <h3>Today</h3>
+
+                        <p>
+                            View today's sales and profit.
+                        </p>
+
+                    </div>
+
+                    <a href="{% url 'report_detail' 'daily' %}" class="report-btn">
+                        View Report
+                    </a>
+
+                </div>
+
+
+
+                <!-- WEEK -->
+
+                <div class="period-card">
+
+                    <div class="period-icon">
+                        W
+                    </div>
+
+                    <div class="period-content">
+
+                        <span>WEEKLY REPORT</span>
+
+                        <h3>This Week</h3>
+
+                        <p>
+                            View this week's sales and profit.
+                        </p>
+
+                    </div>
+
+                    <a href="{% url 'report_detail' 'weekly' %}"  class="report-btn">
+                        View Report
+                    </a>
+
+                </div>
+
+
+
+                <!-- MONTH -->
+
+                <div class="period-card">
+
+                    <div class="period-icon">
+                        M
+                    </div>
+
+                    <div class="period-content">
+
+                        <span>MONTHLY REPORT</span>
+
+                        <h3>This Month</h3>
+
+                        <p>
+                            View this month's sales and profit.
+                        </p>
+
+                    </div>
+
+                    <a href="{% url 'report_detail' 'monthly' %}"  class="report-btn">
+                        View Report
+                    </a>
+
+                </div>
+
+
+
+                <!-- YEAR -->
+
+                <div class="period-card">
+
+                    <div class="period-icon">
+                        Y
+                    </div>
+
+                    <div class="period-content">
+
+                        <span>YEARLY REPORT</span>
+
+                        <h3>This Year</h3>
+
+                        <p>
+                            View this year's sales and profit.
+                        </p>
+
+                    </div>
+
+                    <a href="{% url 'report_detail' 'yearly' %}" class="report-btn">
+                        View Report
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+      
+
+        <footer>
+
+            <p>
+                Shop System &copy; 2026
+            </p>
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,260 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ report_title }} | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/style.css' %}">
+</head>
+
+<body>
+
+<div class="report-page">
+
+    <div class="report-header">
+
+        <div class="brand">
+            <div class="logo">S</div>
+
+            <div>
+                <h1>SHOP SYSTEM</h1>
+                <p>Business Report</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="{% url 'reports' %}" class="back-btn">
+                Back to Reports
+            </a>
+
+            <a href="{% url 'download_report_pdf' report_type %}"
+               class="pdf-btn">
+                Download PDF
+            </a>
+        </div>
+
+    </div>
+
+
+    <main class="report-container">
+
+        <section class="report-title">
+
+            <span class="report-label">
+                {{ report_period }}
+            </span>
+
+            <h2>{{ report_title }}</h2>
+
+            <p>
+                {{ start_date|date:"d M Y" }}
+                --
+                {{ end_date|date:"d M Y" }}
+            </p>
+
+        </section>
+
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+                <span>Total Sales</span>
+                <strong>
+                    TSh {{ total_sales|floatformat:2 }}
+                </strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Total Discount</span>
+                <strong>
+                    TSh {{ total_discount|floatformat:2 }}
+                </strong>
+            </div>
+             <div class="summary-card">
+                <span>Total Expenses</span>
+                <strong>
+                Tsh {{ total_expenses|floatformat:2}}
+                </strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Total Profit</span>
+                <strong>
+                    TSh {{ total_profit|floatformat:2 }}
+                </strong>
+                </strong>
+            </div>
+             <div class="summary-card">
+                <span>Total Net Profit</span>
+                <strong>
+                    TSh {{ total_net_profit|floatformat:2 }}
+                </strong>
+                </strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Transactions</span>
+                <strong>
+                    {{ transaction_count }}
+                </strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Items Sold</span>
+                <strong>
+                    {{ items_sold }}
+                </strong>
+            </div>
+
+        </section>
+
+
+        <section class="report-info">
+
+            <div>
+                <span>Report Type</span>
+                <strong>{{ report_title}}</strong>
+            </div>
+
+            <div>
+                <span>From</span>
+                <strong>
+                    {{ start_date|date:"d/m/Y" }}
+                </strong>
+            </div>
+
+            <div>
+                <span>To</span>
+                <strong>
+                    {{ end_date|date:"d/m/Y" }}
+                </strong>
+            </div>
+
+        </section>
+
+
+        <section class="sales-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h3>Sales Report</h3>
+                    <p>
+                        Sales recorded during this period
+                    </p>
+                </div>
+
+            </div>
+
+
+            {% if sales %}
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Sale No.</th>
+                            <th>Seller</th>
+                            <th>Payment</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Profit</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for sale in sales %}
+
+                        <tr>
+
+                            <td>
+                                {{ sale.sale_number }}
+                            </td>
+
+                            <td>
+                                {{ sale.seller.username }}
+                            </td>
+
+                            <td>
+                                {{ sale.get_payment_method_display }}
+                            </td>
+
+                            <td>
+                                {{ sale.items.count }}
+                            </td>
+
+                            <td>
+                                TSh {{ sale.total|floatformat:2 }}
+                            </td>
+
+                            <td>
+                                TSh {{ sale.report_profit|floatformat:2 }}
+                            </td>
+
+                            <td>
+                                {{ sale.created_at|date:"d/m/Y H:i" }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-report">
+
+                <div class="empty-icon">
+                    —
+                </div>
+
+                <h3>No Sales Found</h3>
+
+                <p>
+                    There are no sales recorded during this report period.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <section class="report-footer">
+
+            <div>
+                <span>Generated</span>
+                <strong>
+                    {{ generated_at|date:"d/m/Y H:i" }}
+                </strong>
+            </div>
+
+            <div>
+                <span>Prepared For</span>
+                <strong>
+                    Owner
+                </strong>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,798 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Agency | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/agency.css' %}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="agency-wrapper">
+
+    <!-- HEADER -->
+    <header class="agency-header">
+
+        <div class="header-left">
+            <div class="header-icon">
+                <i class="fas fa-mobile-screen-button"></i>
+            </div>
+
+            <div>
+                <h1>Agency Management</h1>
+                <p>Manage your mobile money business</p>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <a href="{% url 'home' %}" class="back-btn" style="margin-right: 20px;">
+                <i class="fas fa-arrow-left"></i>
+                Back Home
+            </a>
+             
+             <a href="{% url 'owner_dashboard' %}" class="back-btn">
+                <i class="fa-solid fa-gauge-high"></i>
+               Dashboard
+            </a>
+        </div>
+
+    </header>
+
+
+    <!-- MESSAGES -->
+    {% if messages %}
+        <div class="messages-container">
+
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    <i class="fas fa-circle-info"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+        </div>
+    {% endif %}
+
+
+    <!-- PAGE INTRO -->
+    <section class="page-intro">
+
+        <div>
+            <span class="intro-label">SHOP SYSTEM / AGENCY</span>
+            <h2>Agency Dashboard</h2>
+            <p>Record and monitor your daily mobile money balances.</p>
+        </div>
+
+        <div class="intro-date">
+            <i class="far fa-calendar-days"></i>
+            {{ today|date:"d M Y" }}
+        </div>
+
+    </section>
+
+
+    <!-- GENERAL SUMMARY -->
+    {% if latest_report %}
+
+    <section class="summary-section">
+
+        <div class="section-heading">
+            <div>
+                <h3>General Financial Overview</h3>
+                <p>Latest saved agency report</p>
+            </div>
+
+            <span class="report-date">
+                <i class="far fa-calendar"></i>
+                {{ latest_report.report_date|date:"d M Y" }}
+            </span>
+        </div>
+
+
+        <div class="summary-grid">
+
+            <div class="summary-card">
+                <div class="summary-icon cash-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+
+                <div>
+                    <p>General Cash</p>
+                    <h2>{{ report_totals.cash|floatformat:2 }}</h2>
+                    <span>TZS</span>
+                </div>
+            </div>
+
+
+            <div class="summary-card">
+                <div class="summary-icon float-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+
+                <div>
+                    <p>General Float</p>
+                    <h2>{{ report_totals.float|floatformat:2 }}</h2>
+                    <span>TZS</span>
+                </div>
+            </div>
+
+
+            <div class="summary-card">
+                <div class="summary-icon loan-icon">
+                    <i class="fas fa-hand-holding-dollar"></i>
+                </div>
+
+                <div>
+                    <p>General Loans</p>
+                    <h2>{{ report_totals.loans|floatformat:2 }}</h2>
+                    <span>TZS</span>
+                </div>
+            </div>
+
+
+            <div class="summary-card grand-card">
+                <div class="summary-icon total-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+
+                <div>
+                    <p>Grand Total</p>
+                    <h2>{{ report_totals.total|floatformat:2 }}</h2>
+                    <span>TZS</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    {% else %}
+
+        <div class="empty-summary">
+            <i class="fas fa-chart-pie"></i>
+            <h3>No Agency Report Yet</h3>
+            <p>Submit your first daily report to see your financial overview.</p>
+        </div>
+
+    {% endif %}
+
+
+    <!-- NEW REPORT FORM -->
+    <section class="form-section">
+
+        <div class="section-heading">
+            <div>
+                <h3><i class="fas fa-plus-circle"></i> New Agency Report</h3>
+                <p>Enter cash and float balances for each network.</p>
+            </div>
+        </div>
+
+
+        <form method="POST" id="agencyForm">
+
+            {% csrf_token %}
+
+            <div class="date-field">
+                <label for="report_date">Report Date</label>
+
+                <input
+                    type="date"
+                    name="report_date"
+                    id="report_date"
+                    value="{{ today|date:'Y-m-d' }}"
+                    max="{{ today|date:'Y-m-d' }}"
+                    required
+                >
+            </div>
+
+
+            <!-- NETWORK CARDS -->
+            <div class="network-grid">
+
+                <!-- HALOTEL -->
+                <div class="network-card halotel">
+
+                    <div class="network-heading">
+                        <div class="network-logo">
+                            <i class="fas fa-signal"></i>
+                        </div>
+
+                        <div>
+                            <h3>Halotel</h3>
+                            <span>Mobile Money</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-fields">
+
+                        <div class="field">
+                            <label>Cash (TZS)</label>
+                            <input type="number"
+                                   name="cash_HALOTEL"
+                                   class="balance-input"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label>Float (TZS)</label>
+                            <input type="number"
+                                   name="float_HALOTEL"
+                                   class="balance-input"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"
+                                   required>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VODACOM -->
+                <div class="network-card vodacom">
+
+                    <div class="network-heading">
+                        <div class="network-logo">
+                            <i class="fas fa-signal"></i>
+                        </div>
+
+                        <div>
+                            <h3>Vodacom</h3>
+                            <span>M-Pesa</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-fields">
+
+                        <div class="field">
+                            <label>Cash (TZS)</label>
+                            <input type="number"
+                                   name="cash_VODACOM"
+                                   class="balance-input"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label>Float (TZS)</label>
+                            <input type="number"
+                                   name="float_VODACOM"
+                                   class="balance-input"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"
+                                   required>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AIRTEL -->
+                <div class="network-card airtel">
+
+                    <div class="network-heading">
+                        <div class="network-logo">
+                            <i class="fas fa-signal"></i>
+                        </div>
+
+                        <div>
+                            <h3>Airtel</h3>
+                            <span>Airtel Money</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-fields">
+
+                        <div class="field">
+                            <label>Cash (TZS)</label>
+                            <input type="number"
+                                   name="cash_AIRTEL"
+                                   class="balance-input"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label>Float (TZS)</label>
+                            <input type="number"
+                                   name="float_AIRTEL"
+                                   class="balance-input"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"
+                                   required>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- YAS -->
+                <div class="network-card yas">
+
+                    <div class="network-heading">
+                        <div class="network-logo">
+                            <i class="fas fa-signal"></i>
+                        </div>
+
+                        <div>
+                            <h3>Yas</h3>
+                            <span>Mixx by Yas</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-fields">
+
+                        <div class="field">
+                            <label>Cash (TZS)</label>
+                            <input type="number"
+                                   name="cash_YAS"
+                                   class="balance-input"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label>Float (TZS)</label>
+                            <input type="number"
+                                   name="float_YAS"
+                                   class="balance-input"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"
+                                   required>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOANS SECTION -->
+            <div class="loans-form-section">
+
+                <div class="loan-title">
+                    <div>
+                        <h3>
+                            <i class="fas fa-hand-holding-dollar"></i>
+                            Customer Loans
+                        </h3>
+
+                        <p>Record every customer loan separately.</p>
+                    </div>
+
+                    <button type="button" id="addLoanBtn" class="add-loan-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Loan
+                    </button>
+                </div>
+
+
+                <div id="loanContainer">
+
+                    <div class="loan-row">
+
+                        <div class="loan-field">
+                            <label>Network</label>
+
+                            <select name="loan_network">
+                                <option value="">Select Network</option>
+                                <option value="HALOTEL">Halotel</option>
+                                <option value="VODACOM">Vodacom</option>
+                                <option value="AIRTEL">Airtel</option>
+                                <option value="YAS">Yas</option>
+                            </select>
+                        </div>
+
+
+                        <div class="loan-field">
+                            <label>Customer Name</label>
+
+                            <input type="text"
+                                   name="borrower_name"
+                                   placeholder="Enter customer name">
+                        </div>
+
+
+                        <div class="loan-field">
+                            <label>Loan Date</label>
+
+                            <input type="date"
+                                   name="loan_date"
+                                   max="{{ today|date:'Y-m-d' }}">
+                        </div>
+
+
+                        <div class="loan-field">
+                            <label>Amount (TZS)</label>
+
+                            <input type="number"
+                                   name="loan_amount"
+                                   min="0.01"
+                                   step="0.01"
+                                   placeholder="0.00">
+                        </div>
+
+
+                        <div class="loan-field description-field">
+                            <label>Description</label>
+
+                            <input type="text"
+                                   name="loan_description"
+                                   placeholder="Loan description">
+                        </div>
+
+
+                        <button type="button"
+                                class="remove-loan"
+                                title="Remove loan">
+                            <i class="fas fa-trash"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+            <div class="form-footer">
+
+                <div class="form-note">
+                    <i class="fas fa-circle-info"></i>
+                    Please verify all balances before saving.
+                </div>
+
+                <button type="submit" class="save-report-btn">
+                    <i class="fas fa-floppy-disk"></i>
+                    Save Daily Report
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- DAILY COMPARISON -->
+    {% if comparison %}
+
+    <section class="comparison-section">
+
+        <div class="section-heading">
+            <div>
+                <h3><i class="fas fa-chart-column"></i> Daily Comparison</h3>
+                <p>Latest report compared with previous available report.</p>
+            </div>
+
+            <span class="comparison-date">
+                Previous: {{ comparison.previous_report.report_date|date:"d M Y" }}
+            </span>
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="agency-table">
+
+                <thead>
+                    <tr>
+                        <th>Network</th>
+                        <th>Current Total</th>
+                        <th>Previous Total</th>
+                        <th>Difference</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in comparison.rows %}
+
+                    <tr>
+                        <td>
+                            <strong>{{ item.network }}</strong>
+                        </td>
+
+                        <td>{{ item.current.total|floatformat:2 }}</td>
+
+                        <td>{{ item.previous.total|floatformat:2 }}</td>
+
+                        <td class="{% if item.difference.total > 0 %}positive{% elif item.difference.total < 0 %}negative{% endif %}">
+                            {{ item.difference.total|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                    <tr class="grand-row">
+                        <td>Grand Total</td>
+
+                        <td>{{ comparison.current_general.total|floatformat:2 }}</td>
+
+                        <td>{{ comparison.previous_general.total|floatformat:2 }}</td>
+
+                        <td>{{ comparison.general_difference.total|floatformat:2 }}</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- REPORT HISTORY -->
+    <section class="history-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h3><i class="fas fa-clock-rotate-left"></i> Agency Report History</h3>
+                <p>View and download your previous reports.</p>
+            </div>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="agency-table">
+
+                <thead>
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Report Date</th>
+                        <th>Cash</th>
+                        <th>Float</th>
+                        <th>Loans</th>
+                        <th>Grand Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for report in reports %}
+
+                    <tr>
+                        <td>#{{ report.id }}</td>
+
+                        <td>{{ report.report_date|date:"d M Y" }}</td>
+
+                        <td>
+                            {% with total=report.networks.all %}
+                                {% for network in total %}
+                                    {% if forloop.first %}
+                                        {{ network.cash|floatformat:2 }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </td>
+
+                        <td>
+                            {% for network in report.networks.all %}
+                                {% if forloop.first %}
+                                    {{ network.float_amount|floatformat:2 }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+
+                        <td>
+                            {% for network in report.networks.all %}
+                                {{ network.total_loans|floatformat:2 }}
+                                {% if not forloop.last %}+{% endif %}
+                            {% empty %}
+                                0.00
+                            {% endfor %}
+                        </td>
+
+                        <td class="total-cell">
+                            {% for network in report.networks.all %}
+                                {{ network.network_total|floatformat:2 }}
+                                {% if not forloop.last %}+{% endif %}
+                            {% empty %}
+                                0.00
+                            {% endfor %}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'agency_pdf' report.id %}"
+                               class="pdf-btn">
+                                <i class="fas fa-file-pdf"></i>
+                                PDF
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="7" class="empty-row">
+                            No agency reports found.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer class="agency-footer">
+        <p>SHOP SYSTEM &copy; {% now "Y" %} | Agency Management</p>
+    </footer>
+
+</div>
+
+
+<!-- ADD / REMOVE LOAN JAVASCRIPT -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const addLoanBtn = document.getElementById('addLoanBtn');
+    const loanContainer = document.getElementById('loanContainer');
+    const agencyForm = document.getElementById('agencyForm');
+
+    // Add loan row
+    addLoanBtn.addEventListener('click', function () {
+
+        const loanRow = document.createElement('div');
+
+        loanRow.className = 'loan-row';
+
+        loanRow.innerHTML = `
+            <div class="loan-field">
+                <label>Network</label>
+                <select name="loan_network">
+                    <option value="">Select Network</option>
+                    <option value="HALOTEL">Halotel</option>
+                    <option value="VODACOM">Vodacom</option>
+                    <option value="AIRTEL">Airtel</option>
+                    <option value="YAS">Yas</option>
+                </select>
+            </div>
+
+            <div class="loan-field">
+                <label>Customer Name</label>
+                <input type="text"
+                       name="borrower_name"
+                       placeholder="Enter customer name">
+            </div>
+
+            <div class="loan-field">
+                <label>Loan Date</label>
+                <input type="date"
+                       name="loan_date"
+                       max="{{ today|date:'Y-m-d' }}">
+            </div>
+
+            <div class="loan-field">
+                <label>Amount (TZS)</label>
+                <input type="number"
+                       name="loan_amount"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="0.00">
+            </div>
+
+            <div class="loan-field description-field">
+                <label>Description</label>
+                <input type="text"
+                       name="loan_description"
+                       placeholder="Loan description">
+            </div>
+
+            <button type="button"
+                    class="remove-loan"
+                    title="Remove loan">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+
+        loanContainer.appendChild(loanRow);
+
+    });
+
+
+    // Remove loan row
+    loanContainer.addEventListener('click', function (event) {
+
+        const removeBtn = event.target.closest('.remove-loan');
+
+        if (!removeBtn) return;
+
+        const rows = loanContainer.querySelectorAll('.loan-row');
+
+        const row = removeBtn.closest('.loan-row');
+
+        if (rows.length > 1) {
+            row.remove();
+        } else {
+
+            row.querySelectorAll('input').forEach(input => {
+                input.value = '';
+            });
+
+            row.querySelector('select').value = '';
+        }
+
+    });
+
+
+    // Validate loan date
+    agencyForm.addEventListener('submit', function (event) {
+
+        const reportDate = document.getElementById('report_date').value;
+
+        const loanRows = loanContainer.querySelectorAll('.loan-row');
+
+        for (const row of loanRows) {
+
+            const network = row.querySelector('[name="loan_network"]').value;
+            const borrower = row.querySelector('[name="borrower_name"]').value.trim();
+            const loanDate = row.querySelector('[name="loan_date"]').value;
+            const amount = row.querySelector('[name="loan_amount"]').value;
+            const description = row.querySelector('[name="loan_description"]').value.trim();
+
+            const hasAnyValue = network || borrower || loanDate || amount || description;
+
+            if (hasAnyValue) {
+
+                if (!network || !borrower || !loanDate || !amount || !description) {
+                    event.preventDefault();
+                    alert('Please complete all fields for every loan.');
+                    return;
+                }
+
+                if (loanDate > reportDate) {
+                    event.preventDefault();
+                    alert('Loan date cannot be after report date.');
+                    return;
+                }
+
+            }
+
+        }
+
+    });
+
+});
+
+</script>
+
+</body>
+</html

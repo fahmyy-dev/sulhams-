@@ -1,0 +1,451 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Products | Shop System</title>
+
+    <link rel="stylesheet" href="{% static 'pos/product.css' %}">
+</head>
+
+<body>
+    
+
+<div class="page-container">
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                S
+            </div>
+
+            <div>
+                <h2>SHOP SYSTEM</h2>
+                <span>Owner Panel</span>
+            </div>
+
+        </div>
+         {% if messages %}
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+        <div class="topbar-right">
+
+            <span class="username">
+                {{ request.user.username }}
+            </span>
+
+            <a href="{% url 'owner_dashboard' %}" class="back-btn">
+                Dashboard
+            </a>
+
+            <a href="{% url 'logout' %}" class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="main-content">
+
+        <div class="page-heading">
+
+            <div>
+
+                <span class="page-label">
+                    PRODUCT MANAGEMENT
+                </span>
+
+                <h1>Products</h1>
+
+                <p>
+                    Add and manage cosmetics products and stock.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="add-btn"
+                onclick="openProductForm()"
+            >
+                + Add Product
+            </button>
+
+        </div>
+
+
+        <!-- Add Product -->
+
+        <div id="productForm" class="form-card hidden">
+
+            <div class="form-header">
+
+                <div>
+                    <h2>Add New Product</h2>
+                    <p>Enter the product information below.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="close-btn"
+                    onclick="closeProductForm()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Product Name</label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Example: Nivea Lotion"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Brand</label>
+
+                        <input
+                            type="text"
+                            name="brand"
+                            placeholder="Example: Nivea"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Category</label>
+
+                        <select name="category" required>
+
+                            <option value="">
+                                Select Category
+                            </option>
+
+                            {% for category in categories %}
+
+                                <option value="{{ category.id }}">
+                                    {{ category.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Size / Variant</label>
+
+                        <input
+                            type="text"
+                            name="size"
+                            placeholder="Example: 400ml"
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Product Code</label>
+
+                        <input
+                            type="text"
+                            name="code"
+                            placeholder="Example: NV001"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Buying Price</label>
+
+                        <input
+                            type="number"
+                            name="buying_price"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Selling Price</label>
+
+                        <input
+                            type="number"
+                            name="selling_price"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Stock Quantity</label>
+
+                        <input
+                            type="number"
+                            name="stock_quantity"
+                            min="0"
+                            placeholder="0"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        onclick="closeProductForm()"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="save-btn"
+                    >
+                        Save Product
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- Products -->
+
+        <section class="content-card">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>All Products</h2>
+
+                    <p>
+                        {{ products|length }} active products
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if products %}
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Product</th>
+                                <th>Brand</th>
+                                <th>Category</th>
+                                <th>Code</th>
+                                <th>Buying</th>
+                                <th>Selling</th>
+                                <th>Stock</th>
+                                <th>Enter Qty   &  Add stock</th>
+                                <th>Delete</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for product in products %}
+
+                                <tr>
+
+                                    <td>
+                                        <strong>
+                                            {{ product.name }}
+                                        </strong>
+
+                                        {% if product.size %}
+                                            <small>
+                                                {{ product.size }}
+                                            </small>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {{ product.brand }}
+                                    </td>
+
+                                    <td>
+                                        {{ product.category.name }}
+                                    </td>
+
+                                    <td>
+                                        {{ product.code }}
+                                    </td>
+
+                                    <td>
+                                        TSh {{ product.buying_price }}
+                                    </td>
+
+                                    <td class="selling-price">
+                                        TSh {{ product.selling_price }}
+                                    </td>
+
+                                    <td>
+
+                                        <span
+                                            class="stock
+                                            {% if product.stock_quantity <= 5 %}
+                                                low
+                                            {% endif %}
+                                            "
+                                        >
+                                            {{ product.stock_quantity }}
+                                        </span>
+
+                                    </td>
+                                    <td class="stock-action">
+                                        <form method="POST" action="{% url 'add_stock' product.id %}">
+                                            {% csrf_token %}
+                                            <input
+                                            type="number"
+                                            name="quantity"
+                                            min="1"
+                                            placeholder="Qty"
+                                            required>
+                                            <button type="submit">Add Stock</button>
+                                            
+                                        </form>
+                                    </td>
+                                    <td class="stock-action">
+                                        <form method="POST" action="{%url 'delete_product' product.id %}"
+                                            onsubmit="return confirm('Are you sure you want to delete this product?');"
+                                            class="delete-form">
+                                            {% csrf_token %}
+                                            <button
+                                            type="submit"
+                                            class="delete-btn">Delete</button>
+                                        </form>
+
+                                        
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+                    <div class="delete-all-container">
+                        <form
+                         method="POST" 
+                         action="{% url 'delete_all_products' %}"
+                         onsubmit="return confirm('WARNING! Are you sure you want to delete ALL products')";>
+                         {% csrf_token %}
+                         <button type="submit" class="delete-all-btn">
+                            Delete ALL Products
+                         </button>
+                        </form>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        P
+                    </div>
+
+                    <h3>No Products Yet</h3>
+
+                    <p>
+                        Add your first cosmetics product.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="add-btn"
+                        onclick="openProductForm()"
+                    >
+                        + Add Product
+                    </button>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+
+    <footer class="footer">
+        <p>Shop System &copy; 2026</p>
+    </footer>
+
+</div>
+
+
+<script>
+
+    function openProductForm() {
+        document
+            .getElementById("productForm")
+            .classList.remove("hidden");
+    }
+
+    function closeProductForm() {
+        document
+            .getElementById("productForm")
+            .classList.add("hidden");
+    }
+
+</script>
+
+</body>
+</html>
